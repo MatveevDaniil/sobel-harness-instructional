@@ -103,11 +103,11 @@ sobel_kernel_gpu(float *s,  // source image pixels
 int
 main (int ac, char *av[])
 {
-  int nBlocks = 1, nThreadsPerBlock = 1;
   if (ac != 3) {
     printf("Usage: %s nBlocks nThreadsPerBlock\n", av[0]);
-    int nBlocks = std::atoi(av[1]), nThreadsPerBlock = std::atoi(av[2]);
+    throw std::runtime_error("Invalid command line arguments");
   }
+  int nBlocks = std::atoi(av[1]), nThreadsPerBlock = std::atoi(av[2]);
    // input, output file names hard coded at top of file
 
    // load the input file
