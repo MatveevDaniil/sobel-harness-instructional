@@ -44,12 +44,13 @@ char output_fname[] = "../data/processed-raw-int8-4x-cpu.dat";
 float
 sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
 {
-   float t=0.0;
-
-   // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
-   // of input s, returning a float
-
-   return t;
+  float Gx=0.0, Gy=0.0;
+  for (int x = 0; x < 3; x++)
+  for (int y = 0; y < 3; y++) {
+    Gx += s[x * nclos + y] * gx[x * 3 + y];
+    Gy += s[x * nclos + y] * gy[x * 3 + y];
+  }
+  return std::sqrt(Gx*Gx + Gy*Gy);
 }
 
 
@@ -68,12 +69,13 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
 void
 do_sobel_filtering(float *in, float *out, int ncols, int nrows)
 {
-   float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
-   float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
+  float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
+  float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
 
-   // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
-   // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
-
+  #pragma omp parallel for collapse(2)
+  for (int i = 2; i < nrows - 2; i ++)
+    for (int j = 2; j < ncols - 2; j ++)
+      out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
 }
 
 
