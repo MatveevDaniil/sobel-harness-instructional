@@ -97,12 +97,13 @@ sobel_kernel_gpu(float *s,  // source image pixels
   int j_stride = blockDim.x;
   for (int i = i_index + 2; i < nrows - 2; i += i_stride)
     for (int j = j_index + 2; j < ncols - 2; j += j_stride)
-      out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+      d[i * ncols + j] = sobel_filtered_pixel(s, i, j, ncols, nrows, gx, gy);
 }
 
 int
 main (int ac, char *av[])
 {
+  int nBlocks = 1, nThreadsPerBlock = 1;
   if (ac != 3) {
     printf("Usage: %s nBlocks nThreadsPerBlock\n", av[0]);
     int nBlocks = std::atoi(av[1]), nThreadsPerBlock = std::atoi(av[2]);
