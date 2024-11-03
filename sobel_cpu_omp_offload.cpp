@@ -46,13 +46,14 @@ char output_fname[] = "../data/processed-raw-int8-4x-cpu.dat";
 float
 sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
 {
-
-   float t=0.0;
-
-   // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
-   // of input s, returning a float
-
-   return t;
+  float Gx=0.0, Gy=0.0;
+  float *s_ij = s + i * ncols + j;
+  for (int x = 0; x < 3; x++)
+    for (int y = 0; y < 3; y++) {
+      Gx += s_ij[x * ncols + y] * gx[x * 3 + y];
+      Gy += s_ij[x * ncols + y] * gy[x * 3 + y];
+    }
+  return std::sqrt(Gx*Gx + Gy*Gy);
 }
 
 //
@@ -69,33 +70,25 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
 void
 do_sobel_filtering(float *in, float *out, int ncols, int nrows)
 {
-   float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
-   float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
+  float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
+  float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
 
-   off_t out_indx = 0;
-   int width, height, nvals;
+  off_t out_indx = 0;
+  int width, height, nvals;
 
-   width=ncols;
-   height=nrows;
-   nvals=width*height;
+  width=ncols;
+  height=nrows;
+  nvals=width*height;
+  #pragma omp target data map(to:in[0:nvals]) map(to:width) map(to:height) map(to:Gx[0:9]) map(to:Gy[0:9]) map(from:out[0:nvals])
+  {
 
-// define the data mapping from the host to the device
-// some of the data we only need to send: in, Gx, Gy, width, height
-// some of the data we only need to retrieve: out
+    #pragma omp target teams distribute
+    for (int i = 2; i < nrows - 2; i ++)
+      #pragma omp parallel for
+      for (int j = 2; j < ncols - 2; j ++)
+        out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
 
-// ADD CODE HERE: you will need to add one more item to this line to map the "out" data array such that 
-// it is returned from the the device after the computation is complete. everything else here is input.
-#pragma omp target data map(to:in[0:nvals]) map(to:width) map(to:height) map(to:Gx[0:9]) map(to:Gy[0:9]) 
-   {
-
-   // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
-   // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
-   
-   // don't forget to include a  #pragma omp target teams parallel for around those loop(s).
-   // You may also wish to consider additional clauses that might be appropriate here to increase parallelism 
-   // if you are using nested loops.
-
-   } // pragma omp target data
+  }
 }
 
 
