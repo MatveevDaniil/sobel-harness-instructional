@@ -73,7 +73,6 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
   float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
   float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
 
-  off_t out_indx = 0;
   int width, height, nvals;
 
   width=ncols;
@@ -82,9 +81,8 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
   #pragma omp target data map(to:in[0:nvals]) map(to:width) map(to:height) map(to:Gx[0:9]) map(to:Gy[0:9]) map(from:out[0:nvals])
   {
 
-    #pragma omp target teams distribute
+    #pragma omp target teams distribute parallel for collapse(2)
     for (int i = 2; i < nrows - 2; i ++)
-      #pragma omp parallel for
       for (int j = 2; j < ncols - 2; j ++)
         out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
 
