@@ -58,13 +58,14 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 __device__ float
 sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
 {
-
-   float t=0.0;
-
-   // ADD CODE HERE:  add your code here for computing the sobel stencil computation at location (i,j)
-   // of input s, returning a float
-
-   return t;
+  float Gx=0.0, Gy=0.0;
+  float *s_ij = s + i * ncols + j;
+  for (int x = 0; x < 3; x++)
+    for (int y = 0; y < 3; y++) {
+      Gx += s[x * ncols + y] * gx[x * 3 + y];
+      Gy += s[x * ncols + y] * gy[x * 3 + y];
+    }
+  return std::sqrt(Gx*Gx + Gy*Gy);
 }
 
 //
@@ -90,16 +91,22 @@ sobel_kernel_gpu(float *s,  // source image pixels
       int ncols,
       float *gx, float *gy) // gx and gy are stencil weights for the sobel filter
 {
-   // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
-   // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
-
-   // because this is CUDA, you need to use CUDA built-in variables to compute an index and stride
-   // your processing motif will be very similar here to that we used for vector add in Lab #2
+  int i_index = blockIdx.x;
+  int i_stride = gridDim.x;
+  int j_index = threadIdx.x;
+  int j_stride = blockDim.x;
+  for (int i = i_index + 2; i < nrows - 2; i += i_stride)
+    for (int j = j_index + 2; j < ncols - 2; j += j_stride)
+      out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
 }
 
 int
 main (int ac, char *av[])
 {
+  if (ac != 3) {
+    printf("Usage: %s nBlocks nThreadsPerBlock\n", av[0]);
+    int nBlocks = std::atoi(av[1]), nThreadsPerBlock = std::atoi(av[2]);
+  }
    // input, output file names hard coded at top of file
 
    // load the input file
@@ -154,7 +161,6 @@ main (int ac, char *av[])
    cudaMemPrefetchAsync((void *)device_gy, sizeof(Gy)*sizeof(float), deviceID);
 
    // set up to run the kernel
-   int nBlocks=1, nThreadsPerBlock=256;
 
    // ADD CODE HERE: insert your code here to set a different number of thread blocks or # of threads per block
 
