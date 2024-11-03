@@ -45,10 +45,11 @@ float
 sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
 {
   float Gx=0.0, Gy=0.0;
+  float *s_ij = s + i * ncols + j;
   for (int x = 0; x < 3; x++)
     for (int y = 0; y < 3; y++) {
-      Gx += s[(i + x) * ncols + (j + y)] * gx[x * 3 + y];
-      Gy += s[(i + x) * ncols + (j + y)] * gy[x * 3 + y];
+      Gx += s[x * ncols + y] * gx[x * 3 + y];
+      Gy += s[x * ncols + y] * gy[x * 3 + y];
     }
   return std::sqrt(Gx*Gx + Gy*Gy);
 }
@@ -71,7 +72,7 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
 {
   float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
   float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
-
+  
   #pragma omp parallel for collapse(2)
   for (int i = 2; i < nrows - 2; i ++)
     for (int j = 2; j < ncols - 2; j ++)

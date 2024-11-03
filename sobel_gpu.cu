@@ -62,8 +62,8 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
   float *s_ij = s + i * ncols + j;
   for (int x = 0; x < 3; x++)
     for (int y = 0; y < 3; y++) {
-      Gx += s[x * ncols + y] * gx[x * 3 + y];
-      Gy += s[x * ncols + y] * gy[x * 3 + y];
+      Gx += s_ij[x * ncols + y] * gx[x * 3 + y];
+      Gy += s_ij[x * ncols + y] * gy[x * 3 + y];
     }
   return std::sqrt(Gx*Gx + Gy*Gy);
 }
