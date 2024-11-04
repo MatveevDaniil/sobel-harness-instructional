@@ -53,7 +53,7 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
       Gx += s_ij[x * ncols + y] * gx[x * 3 + y];
       Gy += s_ij[x * ncols + y] * gy[x * 3 + y];
     }
-  return std::sqrt(Gx*Gx + Gy*Gy);
+  return std::sqrt(Gx * Gx + Gy * Gy);
 }
 
 //
@@ -73,20 +73,12 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
   float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
   float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
 
-  int width, height, nvals;
-
-  width=ncols;
-  height=nrows;
-  nvals=width*height;
-  #pragma omp target data map(to:in[0:nvals]) map(to:width) map(to:height) map(to:Gx[0:9]) map(to:Gy[0:9]) map(from:out[0:nvals])
-  {
-
-    #pragma omp target teams distribute parallel for collapse(2)
-    for (int i = 2; i < nrows - 2; i ++)
-      for (int j = 2; j < ncols - 2; j ++)
-        out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
-
-  }
+  #pragma omp target teams distribute parallel for collapse(2) \
+    map(to: in[0:ncols*nrows], Gx[0:9], Gy[0:9]) \
+    map(from: out[0:ncols*nrows])
+  for (int i = 2; i < nrows - 2; i ++)
+    for (int j = 2; j < ncols - 2; j ++)
+      out[i * ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
 }
 
 
