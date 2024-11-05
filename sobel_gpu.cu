@@ -111,7 +111,7 @@ main (int ac, char *av[])
    // input, output file names hard coded at top of file
 
    // load the input file
-   off_t nvalues = data_dims[0]*data_dims[1];
+   off_t nvalues = data_dims[0] * data_dims[1];
    unsigned char *in_data_bytes = (unsigned char *)malloc(sizeof(unsigned char)*nvalues);
 
    FILE *f = fopen(input_fname,"r");
