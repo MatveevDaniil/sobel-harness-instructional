@@ -1,7 +1,8 @@
 mkdir -p results
 chmod +x ./*
+dcgmi profile --pause
 
-ncu_pref="ncu --set default --section SourceCounters --metrics smsp__cycles_active.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed,gpu__time_duration.avg"
+ncu_pref="ncu --set default --section SourceCounters --metrics smsp__cycles_active.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed,gpu__time_duration.avg --target-processes all"
 for T in 1 2; do
   export OMP_NUM_THREADS=$T
   ./sobel_cpu > results/sobel-cpu-$T
