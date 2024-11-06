@@ -1,0 +1,34 @@
+==PROF== Connected to process 1732948 (/pscratch/sd/m/morphism/sobel-harness-instructional/build/sobel_gpu)
+==PROF== Profiling "sobel_kernel_gpu" - 0: 0%....50%....100% - 5 passes
+ Read data from the file ../data/zebra-gray-int8-4x 
+ GPU configuration: 256 blocks, 1024 threads per block 
+ Wrote the output file ../data/processed-raw-int8-4x-cpu.dat 
+==PROF== Disconnected from process 1732948
+[1732948] sobel_gpu@127.0.0.1
+  sobel_kernel_gpu(float *, float *, int, int, int, float *, float *) (256, 1, 1)x(1024, 1, 1), Context 1, Stream 7, Device 0, CC 8.0
+    Section: Command line profiler metrics
+    ----------------------------------------------------- ----------- ------------
+    Metric Name                                           Metric Unit Metric Value
+    ----------------------------------------------------- ----------- ------------
+    dram__throughput.avg.pct_of_peak_sustained_elapsed              %        27.30
+    gpu__time_duration.avg                                    usecond       679.71
+    smsp__cycles_active.avg.pct_of_peak_sustained_elapsed           %        69.91
+    ----------------------------------------------------- ----------- ------------
+
+    Section: Source Counters
+    ------------------------- ----------- ------------
+    Metric Name               Metric Unit Metric Value
+    ------------------------- ----------- ------------
+    Branch Instructions Ratio           %         0.05
+    Branch Instructions              inst    3,961,776
+    Branch Efficiency                   %        99.75
+    Avg. Divergent Branches                      14.97
+    ------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 0%                                                                                         
+          This kernel has uncoalesced global accesses resulting in a total of 11415240 excessive sectors (15% of the    
+          total 77767608 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source       
+          locations. The CUDA Programming Guide                                                                         
+          (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) had additional      
+          information on reducing uncoalesced device memory accesses.                                                   
+

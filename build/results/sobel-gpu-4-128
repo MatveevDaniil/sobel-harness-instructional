@@ -1,0 +1,36 @@
+==PROF== Connected to process 1730863 (/pscratch/sd/m/morphism/sobel-harness-instructional/build/sobel_gpu)
+==PROF== Profiling "sobel_kernel_gpu" - 0: 0%..
+==WARNING== Launching the workload is taking more time than expected. If this continues to hang, terminate the profile and re-try by profiling the range of all related launches using '--replay-mode range'. See https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#replay for more details.
+..50%....100% - 5 passes
+ Read data from the file ../data/zebra-gray-int8-4x 
+ GPU configuration: 4 blocks, 128 threads per block 
+ Wrote the output file ../data/processed-raw-int8-4x-cpu.dat 
+==PROF== Disconnected from process 1730863
+[1730863] sobel_gpu@127.0.0.1
+  sobel_kernel_gpu(float *, float *, int, int, int, float *, float *) (4, 1, 1)x(128, 1, 1), Context 1, Stream 7, Device 0, CC 8.0
+    Section: Command line profiler metrics
+    ----------------------------------------------------- ----------- ------------
+    Metric Name                                           Metric Unit Metric Value
+    ----------------------------------------------------- ----------- ------------
+    dram__throughput.avg.pct_of_peak_sustained_elapsed              %         0.18
+    gpu__time_duration.avg                                    msecond       102.62
+    smsp__cycles_active.avg.pct_of_peak_sustained_elapsed           %         3.69
+    ----------------------------------------------------- ----------- ------------
+
+    Section: Source Counters
+    ------------------------- ----------- ------------
+    Metric Name               Metric Unit Metric Value
+    ------------------------- ----------- ------------
+    Branch Instructions Ratio           %         0.04
+    Branch Instructions              inst    3,513,496
+    Branch Efficiency                   %        99.72
+    Avg. Divergent Branches                      14.97
+    ------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 0%                                                                                         
+          This kernel has uncoalesced global accesses resulting in a total of 11415240 excessive sectors (15% of the    
+          total 77767608 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source       
+          locations. The CUDA Programming Guide                                                                         
+          (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) had additional      
+          information on reducing uncoalesced device memory accesses.                                                   
+
